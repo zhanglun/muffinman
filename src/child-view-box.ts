@@ -1,16 +1,14 @@
-import { LitElement, html, css } from "lit";
+import { LitElement, html, css, PropertyValues } from "lit";
 import { customElement, property } from "lit/decorators.js";
+import { WebviewContext } from "./contexts/webview-context";
+import type { WebviewContextType } from "./contexts/webview-context";
+import { consume } from "@lit/context";
 
 @customElement("child-view-box")
 export class ChildViewBox extends LitElement {
-  declare showView: boolean;
-
-  static properties = { showView: { type: Boolean } };
-
-  constructor() {
-    super();
-    this.showView = false;
-  }
+  @consume({ context: WebviewContext, subscribe: true })
+  @property({ attribute: false })
+  public viewContext?: WebviewContextType;
 
   connectedCallback() {
     super.connectedCallback();
@@ -92,7 +90,7 @@ export class ChildViewBox extends LitElement {
   }
 
   private async updatePosition() {
-    if (!this.showView) return;
+    if (!this.viewContext?.showWebview) return;
 
     // 等待下一帧，确保 DOM 已更新
     await new Promise((resolve) => requestAnimationFrame(resolve));
@@ -113,9 +111,10 @@ export class ChildViewBox extends LitElement {
     }
   }
 
-  updated(changedProperties: Map<string | number | symbol, unknown>) {
+  updated(changedProperties: PropertyValues) {
     super.updated(changedProperties);
-    if (changedProperties.has("showView")) {
+    if (changedProperties.has("viewContext")) {
+      // 更新组件的内容
       // 当 showView 状态改变时，更新位置
       setTimeout(() => {
         this.updatePosition();
@@ -125,7 +124,7 @@ export class ChildViewBox extends LitElement {
 
   render() {
     return html`
-      <div class="placeholder ${this.showView ? "hidden" : ""}">
+      <div class="placeholder ${this.viewContext?.showWebview ? "hidden" : ""}">
         WebContentsView 将显示在这里
       </div>
     `;
@@ -157,8 +156,6 @@ export class ChildViewBox extends LitElement {
       display: none;
     }
   `;
-
-
 }
 
 declare global {

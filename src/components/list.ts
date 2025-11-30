@@ -41,7 +41,8 @@ export class MuffinList extends BaseElement {
   @state() private items = items;
 
   private _selectItem(item: any) {
-    this.viewContext?.setCurrent(item.name)
+    this.viewContext?.setCurrent(item)
+    this.viewContext?.setShowWebview(true);
   }
 
   protected updated(_changedProperties: PropertyValues): void {
@@ -54,7 +55,7 @@ export class MuffinList extends BaseElement {
         ${this.items.map((item) => {
           return html`<li class="list-row" @click=${() => this._selectItem(item)}>
             <div>${item.name}</div>
-            <div>${this.viewContext?.current}</div>
+            <div>${this.viewContext?.current.name}</div>
             <div class="text-xs uppercase font-semibold opacity-60">${item.url}</div>
           </li>`;
         })}

@@ -3,16 +3,19 @@ import { customElement } from "lit/decorators.js";
 import { BaseElement } from "./base-element";
 import './layout';
 import { provide } from "@lit/context";
-import { WebviewContext } from "./contexts/webview-context";
+import { WebviewContext, WebviewInfo } from "./contexts/webview-context";
 
 @customElement("muffin-app")
 export class MuffinApp extends BaseElement {
 
   @provide({ context: WebviewContext })
   webviewContext = {
-    current: '',
+    current: {
+      url: '',
+      name: '',
+    },
     showWebview: false,
-    setCurrent: (view: string) => {
+    setCurrent: (view: WebviewInfo) => {
       this.webviewContext = {
         ...this.webviewContext,
         current: view
@@ -20,6 +23,12 @@ export class MuffinApp extends BaseElement {
     },
     getCurent: () => {
       return this.webviewContext.current
+    },
+    setShowWebview: (show: boolean) => {
+      this.webviewContext = {
+        ...this.webviewContext,
+        showWebview: show
+      }
     }
   };
 

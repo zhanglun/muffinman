@@ -53,7 +53,7 @@ function createWindow() {
 }
 
 // 创建 WebContentsView
-function createWebContentsView(bounds?: {
+function createWebContentsView(info: {url: string, name: string}, bounds?: {
   x: number;
   y: number;
   width: number;
@@ -86,7 +86,7 @@ function createWebContentsView(bounds?: {
 
   // 加载远程 URL
   webContentsView.webContents.loadURL(
-    "https://chat.deepseek.com/a/chat/s/27a6f20c-30a8-4b63-85da-346956c1ed8c"
+    info.url
   );
 
   // 监听页面加载完成事件
@@ -139,9 +139,10 @@ ipcMain.handle(
   "webview:create",
   (
     _event,
+    webviewInfo: {url: string, name: string},
     bounds?: { x: number; y: number; width: number; height: number }
   ) => {
-    createWebContentsView(bounds);
+    createWebContentsView(webviewInfo, bounds);
     return { success: true };
   }
 );
