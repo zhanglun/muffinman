@@ -28,8 +28,4 @@ export default defineConfig({
         : {},
     }),
   ],
-  // 确保 Lit 模板语法正确处理
-  optimizeDeps: {
-    include: ['lit'],
-  },
 })

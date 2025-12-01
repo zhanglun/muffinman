@@ -19,17 +19,17 @@
   },
   "main": "dist-electron/main.js",
   "dependencies": {
-    "@heroui/react": "^2.8.5",
-    "@lit/context": "^1.1.6",
+    "@heroui/react": "3.0.0-beta.2",
+    "@heroui/styles": "3.0.0-beta.2",
     "@tailwindcss/vite": "^4.1.17",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "daisyui": "^5.5.5",
     "framer-motion": "^12.23.24",
     "jotai": "^2.15.1",
-    "lit": "^3.3.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-router-dom": "^7.9.6",
     "tailwindcss": "^4.1.17"
   }
 }
