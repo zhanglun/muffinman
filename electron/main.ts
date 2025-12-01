@@ -1,6 +1,9 @@
 import { app, BrowserWindow, WebContentsView, ipcMain } from "electron";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { AIServiceManager } from "./services/ai-manager";
+import { ServiceConfig } from "./services/types";
+import { AIService } from "./services/ai";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -53,12 +56,15 @@ function createWindow() {
 }
 
 // 创建 WebContentsView
-function createWebContentsView(info: {url: string, name: string}, bounds?: {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}) {
+function createWebContentsView(
+  info: { url: string; name: string },
+  bounds?: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  }
+) {
   if (!win || webContentsView) return;
 
   webContentsView = new WebContentsView({
@@ -85,16 +91,14 @@ function createWebContentsView(info: {url: string, name: string}, bounds?: {
   }
 
   // 加载远程 URL
-  webContentsView.webContents.loadURL(
-    info.url
-  );
+  webContentsView.webContents.loadURL(info.url);
 
   // 监听页面加载完成事件
   webContentsView.webContents.on("did-finish-load", () => {
-    webContentsView.webContents.openDevTools();
+    webContentsView?.webContents.openDevTools();
 
     // 执行 JavaScript 获取 DOM 元素
-    webContentsView.webContents
+    webContentsView?.webContents
       .executeJavaScript(
         `
     // 你的 DOM 操作代码，例如获取特定元素的内容
@@ -139,7 +143,7 @@ ipcMain.handle(
   "webview:create",
   (
     _event,
-    webviewInfo: {url: string, name: string},
+    webviewInfo: { url: string; name: string },
     bounds?: { x: number; y: number; width: number; height: number }
   ) => {
     createWebContentsView(webviewInfo, bounds);
@@ -183,4 +187,68 @@ app.on("activate", () => {
   }
 });
 
-app.whenReady().then(createWindow);
+let aiServiceManager: AIServiceManager | null = null;
+
+app.whenReady().then(() => {
+  createWindow();
+  // 初始化 AI 服务管理器
+  aiServiceManager = new AIServiceManager(win as BrowserWindow);
+
+  // 预加载常用服务
+  aiServiceManager.preloadService("openai");
+  aiServiceManager.preloadService("claude");
+});
+
+ipcMain.handle("get-services", async () => {
+  if (!aiServiceManager) return [];
+
+  const services: ServiceConfig[] = [];
+
+  aiServiceManager.getServices().forEach((service: AIService) => {
+    services.push({
+      id: service.id,
+      name: service.name,
+      urls: service.urls,
+    });
+  });
+  return services;
+});
+
+ipcMain.handle(
+  "switch-to-service",
+  async (event, serviceId, specificUrl = null) => {
+    if (aiServiceManager) {
+      const service = await aiServiceManager.switchToService(
+        serviceId,
+        specificUrl
+      );
+      return { success: true, service: service.id };
+    }
+    return { success: false, error: "Service manager not initialized" };
+  }
+);
+
+ipcMain.handle("preload-service", async (event, serviceId) => {
+  if (aiServiceManager) {
+    aiServiceManager.preloadService(serviceId);
+    return { success: true };
+  }
+  return { success: false };
+});
+
+ipcMain.handle("register-service", async (event, serviceConfig) => {
+  if (aiServiceManager) {
+    // 动态注册新服务
+    const newServiceId = serviceConfig.name.toLowerCase().replace(/\s+/g, "-");
+    const config = {
+      id: newServiceId,
+      name: serviceConfig.name,
+      domains: [new URL(serviceConfig.url).hostname],
+      urls: [serviceConfig.url],
+    };
+
+    aiServiceManager.registerService(config);
+    return { success: true, serviceId: newServiceId };
+  }
+  return { success: false };
+});
