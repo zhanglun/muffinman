@@ -1,9 +1,7 @@
-import { Layout } from './layouts/layout'
+import { Router } from './router'
 
-function App() {
+export default function App() {
   return (
-    <Layout />
+    <Router />
   )
 }
-
-export default App
