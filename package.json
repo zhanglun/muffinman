@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@vitejs/plugin-react": "^5.1.1",
     "electron": "^30.0.1",
     "electron-builder": "^24.13.3",
     "typescript": "^5.2.2",
@@ -18,10 +19,17 @@
   },
   "main": "dist-electron/main.js",
   "dependencies": {
+    "@heroui/react": "^2.8.5",
     "@lit/context": "^1.1.6",
     "@tailwindcss/vite": "^4.1.17",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
     "daisyui": "^5.5.5",
+    "framer-motion": "^12.23.24",
+    "jotai": "^2.15.1",
     "lit": "^3.3.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
     "tailwindcss": "^4.1.17"
   }
 }
