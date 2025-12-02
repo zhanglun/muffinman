@@ -207,9 +207,11 @@ export class AIService {
 
   // 隐藏服务
   hide(): void {
-    if (this.currentWebView) {
-      this.currentWebView.setVisible(false)
-    }
+    // 隐藏该服务的所有 webview
+    this.webViews.forEach((webView) => {
+      webView.setVisible(false)
+    })
+    this.currentWebView = null
   }
 
   // 预加载服务

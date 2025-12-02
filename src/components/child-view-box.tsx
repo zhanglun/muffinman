@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   useCurrentWebviewValue,
   useShowWebviewValue,
-} from "../atoms/webview-atoms";
+} from "../atoms/ai-services-atoms";
 
 const throttle = (fn: () => void, delay: number) => {
   let timeoutId: number | null = null;
@@ -58,7 +58,7 @@ export const ChildViewBox = () => {
     await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
 
     try {
-      await window.ipcRenderer.invoke("webview:setBounds", bounds);
+      await (window.ipcRenderer as any).invoke("webview:setBounds", bounds);
     } catch (error) {
       console.error("Failed to update webview position:", error);
     }
@@ -106,7 +106,7 @@ export const ChildViewBox = () => {
 
   useEffect(() => {
     const toggleWebview = async () => {
-      if (showWebview) {
+      if (showWebview && currentWebview) {
         await new Promise((resolve) => setTimeout(resolve, 50));
 
         const bounds = getBounds(containerRef.current);
@@ -115,20 +115,23 @@ export const ChildViewBox = () => {
         }
 
         try {
-          await window.ipcRenderer.invoke(
-            "webview:create",
-            currentWebview,
+          // 使用新的 switchToService API，传入 bounds
+          await (window.ipcRenderer as any).switchToService(
+            currentWebview.id,
+            currentWebview.url,
             bounds
           );
+          // 确保 bounds 被设置
           throttledUpdate();
         } catch (error) {
-          console.error("Failed to create webview:", error);
+          console.error("Failed to switch to service:", error);
         }
       } else {
         try {
-          await window.ipcRenderer.invoke("webview:destroy");
+          // 使用新的 hide API
+          await (window.ipcRenderer as any).invoke("webview:hide");
         } catch (error) {
-          console.error("Failed to destroy webview:", error);
+          console.error("Failed to hide webview:", error);
         }
       }
     };

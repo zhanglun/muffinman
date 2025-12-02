@@ -1,4 +1,4 @@
-import { app, BrowserWindow, WebContentsView, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { AIServiceManager } from "./services/ai-manager";
@@ -28,7 +28,6 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
   : RENDERER_DIST;
 
 let win: BrowserWindow | null;
-let webContentsView: WebContentsView | null = null;
 
 function createWindow() {
   win = new BrowserWindow({
@@ -55,125 +54,14 @@ function createWindow() {
   }
 }
 
-// 创建 WebContentsView
-function createWebContentsView(
-  info: { url: string; name: string },
-  bounds?: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  }
-) {
-  if (!win || webContentsView) return;
-
-  webContentsView = new WebContentsView({
-    webPreferences: {
-      devTools: true,
-    },
-  });
-
-  // 将 WebContentsView 添加到主窗口的 contentView
-  win.contentView.addChildView(webContentsView);
-
-  // 如果提供了位置信息，使用它；否则使用默认位置
-  if (bounds) {
-    webContentsView.setBounds(bounds);
-  } else {
-    // 默认位置（在主窗口底部，高度 600px）
-    const winBounds = win.getBounds();
-    webContentsView.setBounds({
-      x: 0,
-      y: winBounds.height - 600,
-      width: winBounds.width,
-      height: 600,
-    });
-  }
-
-  // 加载远程 URL
-  webContentsView.webContents.loadURL(info.url);
-
-  // 监听页面加载完成事件
-  webContentsView.webContents.on("did-finish-load", () => {
-    webContentsView?.webContents.openDevTools();
-
-    // 执行 JavaScript 获取 DOM 元素
-    webContentsView?.webContents
-      .executeJavaScript(
-        `
-    // 你的 DOM 操作代码，例如获取特定元素的内容
-    const targetElement = document.querySelector('.ds-modal-content');
-    const elementData = targetElement ? targetElement.innerText : '元素未找到';
-    elementData; // 返回获取的数据
-  `
-      )
-      .then((result) => {
-        // 处理从 WebView 中返回的数据
-        console.log("获取到的元素数据:", result);
-      })
-      .catch((err) => {
-        console.error("执行 JavaScript 失败:", err);
-      });
-  });
-}
-
-// 更新 WebContentsView 的位置和大小
-function setWebContentsViewBounds(bounds: {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}) {
-  if (webContentsView && win) {
-    webContentsView.setBounds(bounds);
-  }
-}
-
-// 销毁 WebContentsView
-function destroyWebContentsView() {
-  if (webContentsView && win) {
-    win.contentView.removeChildView(webContentsView);
-    // WebContentsView 销毁时会自动清理其 webContents
-    webContentsView = null;
-  }
-}
 
 // IPC 处理程序
-ipcMain.handle(
-  "webview:create",
-  (
-    _event,
-    webviewInfo: { url: string; name: string },
-    bounds?: { x: number; y: number; width: number; height: number }
-  ) => {
-    createWebContentsView(webviewInfo, bounds);
-    return { success: true };
-  }
-);
-
-ipcMain.handle("webview:destroy", () => {
-  destroyWebContentsView();
-  return { success: true };
-});
-
-ipcMain.handle("webview:exists", () => {
-  return { exists: webContentsView !== null };
-});
-
-ipcMain.handle(
-  "webview:setBounds",
-  (_event, bounds: { x: number; y: number; width: number; height: number }) => {
-    setWebContentsViewBounds(bounds);
-    return { success: true };
-  }
-);
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
-    destroyWebContentsView();
     app.quit();
     win = null;
   }
@@ -194,9 +82,7 @@ app.whenReady().then(() => {
   // 初始化 AI 服务管理器
   aiServiceManager = new AIServiceManager(win as BrowserWindow);
 
-  // 预加载常用服务
-  aiServiceManager.preloadService("openai");
-  aiServiceManager.preloadService("claude");
+  // 不再预加载服务，按需创建 webview
 });
 
 ipcMain.handle("get-services", async () => {
@@ -216,12 +102,19 @@ ipcMain.handle("get-services", async () => {
 
 ipcMain.handle(
   "switch-to-service",
-  async (event, serviceId, specificUrl = null) => {
+  async (event, serviceId, specificUrl = null, bounds = null) => {
     if (aiServiceManager) {
       const service = await aiServiceManager.switchToService(
         serviceId,
         specificUrl
       );
+
+      console.log("🚀 ~ service:", service)
+
+      // 如果提供了 bounds，设置 webview 的位置和大小
+      if (bounds && service.currentWebView) {
+        service.currentWebView.setBounds(bounds);
+      }
       return { success: true, service: service.id };
     }
     return { success: false, error: "Service manager not initialized" };
@@ -249,6 +142,27 @@ ipcMain.handle("register-service", async (event, serviceConfig) => {
 
     aiServiceManager.registerService(config);
     return { success: true, serviceId: newServiceId };
+  }
+  return { success: false };
+});
+
+// 设置当前 webview 的 bounds
+ipcMain.handle(
+  "webview:setBounds",
+  async (event, bounds: { x: number; y: number; width: number; height: number }) => {
+    if (aiServiceManager) {
+      const result = await aiServiceManager.setCurrentWebViewBounds(bounds);
+      return { success: result };
+    }
+    return { success: false };
+  }
+);
+
+// 隐藏当前 webview
+ipcMain.handle("webview:hide", async () => {
+  if (aiServiceManager) {
+    await aiServiceManager.hideCurrentService();
+    return { success: true };
   }
   return { success: false };
 });

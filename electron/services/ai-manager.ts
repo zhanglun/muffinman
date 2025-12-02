@@ -19,6 +19,27 @@ export class AIServiceManager {
   setupDefaultServices(): void {
     const serviceConfigs: ServiceConfig[] = [
       {
+        id: 'kimi',
+        name: 'Kimi',
+        urls: [
+          'https://www.kimi.com/',
+        ],
+      },
+      {
+        id: 'qwen',
+        name: 'Qwen',
+        urls: [
+          'https://chat.qwen.ai',
+        ],
+      },
+      {
+        id: 'deepseek',
+        name: 'DeepSeek',
+        urls: [
+          'https://chat.deepseek.com',
+        ],
+      },
+      {
         id: 'openai',
         name: 'OpenAI',
         urls: [
@@ -90,10 +111,10 @@ export class AIServiceManager {
       return this.currentService
     }
 
-    // 隐藏当前服务
-    if (this.currentService) {
-      this.currentService.hide()
-    }
+    // 隐藏所有服务的所有 webview
+    this.services.forEach((service: any) => {
+      service.hide()
+    })
 
     // 显示新服务
     const service = this.services.get(serviceId) as any
@@ -118,6 +139,27 @@ export class AIServiceManager {
     const service = this.services.get(serviceId) as any
     if (service && !service.isLoaded) {
       service.preload()
+    }
+  }
+
+  // 设置当前 webview 的 bounds
+  async setCurrentWebViewBounds(bounds: {
+    x: number
+    y: number
+    width: number
+    height: number
+  }): Promise<boolean> {
+    if (this.currentService && this.currentService.currentWebView) {
+      this.currentService.currentWebView.setBounds(bounds)
+      return true
+    }
+    return false
+  }
+
+  // 隐藏当前服务
+  async hideCurrentService(): Promise<void> {
+    if (this.currentService) {
+      this.currentService.hide()
     }
   }
 }
