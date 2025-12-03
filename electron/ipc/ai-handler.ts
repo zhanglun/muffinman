@@ -2,11 +2,14 @@ import { ipcMain } from 'electron';
 import { AIServiceManager } from '../services/ai-manager';
 import { AIService } from '../services/ai';
 import { ServiceConfig } from '../services/types';
+import { WindowManager } from '../managers/windows';
 
 export class AIIPC {
   private aiServiceManager: AIServiceManager | null = null;
+  private windowManager: WindowManager;
 
-  constructor() {
+  constructor(windowManager: WindowManager) {
+    this.windowManager = windowManager;
     this.init();
   }
 
@@ -32,11 +35,17 @@ export class AIIPC {
 
     ipcMain.handle(
       "switch-to-service",
-      async (_event, serviceId, specificUrl = null) => {
+      async (_event, serviceId, specificUrl = null, bounds?: {
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+      }) => {
         if (this.aiServiceManager) {
           const service = await this.aiServiceManager.switchToService(
             serviceId,
-            specificUrl
+            specificUrl,
+            bounds
           );
           return { success: true, service: service.id };
         }

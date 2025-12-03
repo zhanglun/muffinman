@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import {
   useCurrentWebviewValue,
   useShowWebviewValue,
@@ -45,12 +45,13 @@ export const ChildViewBox = () => {
   const currentWebview = useCurrentWebviewValue();
   const showWebview = useShowWebviewValue();
 
-  const updateBounds = useCallback(async () => {
+  const updateBounds = async () => {
     if (!showWebview) {
       return;
     }
 
     const bounds = getBounds(containerRef.current);
+
     if (!bounds) {
       return;
     }
@@ -62,7 +63,7 @@ export const ChildViewBox = () => {
     } catch (error) {
       console.error("Failed to update webview position:", error);
     }
-  }, [showWebview]);
+  };
 
   const throttledUpdate = useMemo(
     () =>
@@ -121,6 +122,7 @@ export const ChildViewBox = () => {
             currentWebview.url,
             bounds
           );
+
           // 确保 bounds 被设置
           throttledUpdate();
         } catch (error) {
@@ -148,7 +150,7 @@ export const ChildViewBox = () => {
   return (
     <div
       ref={containerRef}
-      className="w-full h-[600px] rounded-lg overflow-hidden bg-[#1a1a1a] relative mt-5"
+      className="w-full h-full overflow-hidden bg-[#1a1a1a] relative"
     >
       {!showWebview && (
         <div className="flex items-center justify-center w-full h-full text-[#888] text-sm">

@@ -3,10 +3,10 @@ import { WindowManager } from '../managers/windows';
 
 export class WebviewIPC {
   constructor(private windowManager: WindowManager) {
-    this.init();
+    this.registerHandlers();
   }
 
-  private init() {
+  private registerHandlers() {
     // IPC 处理程序
     ipcMain.handle(
       "webview:create",
@@ -25,9 +25,13 @@ export class WebviewIPC {
       return { success: true };
     });
 
-    ipcMain.handle("webview:exists", () => {
-      return { exists: this.windowManager.hasWebContentsView() };
-    });
+    // ipcMain.handle("webview:hide",() => {
+    //   this.windowManager.focusMainWindow();
+    // })
+
+    // ipcMain.handle("webview:exists", () => {
+    //   return { exists: this.windowManager.hasWebContentsView() };
+    // });
 
     ipcMain.handle(
       "webview:setBounds",

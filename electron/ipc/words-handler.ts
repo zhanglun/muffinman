@@ -1,5 +1,6 @@
 import { ipcMain } from 'electron';
 import { AIServiceManager } from '../services/ai-manager';
+import { WindowManager } from '../managers/windows';
 
 export interface SendWordsDTO {
   words: string;
@@ -8,8 +9,10 @@ export interface SendWordsDTO {
 
 export class WordsIPC {
   private aiServiceManager: AIServiceManager | null = null;
+  private windowManager: WindowManager;
 
-  constructor() {
+  constructor(windowManager: WindowManager) {
+    this.windowManager = windowManager;
     this.registerHandlers();
   }
 

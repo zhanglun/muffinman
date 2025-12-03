@@ -31,8 +31,8 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
 
 const windowManager = new WindowManager();
 const webviewIPC = new WebviewIPC(windowManager);
-const aiIPC = new AIIPC();
-const wordsIPC = new WordsIPC(); // 已创建WordsIPC实例
+const aiIPC = new AIIPC(windowManager);
+const wordsIPC = new WordsIPC(windowManager); // 已创建WordsIPC实例
 
 app.on("activate", () => {
   // On OS X it's common to re-create a window in the app when the
@@ -70,7 +70,7 @@ const createWindow = () => {
 
     // 初始化 AI 服务管理器（仅在首次创建窗口时）
     if (!aiServiceManager) {
-      aiServiceManager = new AIServiceManager(win);
+      aiServiceManager = new AIServiceManager(windowManager);
       aiIPC.setAIServiceManager(aiServiceManager);
       wordsIPC.setAIServiceManager(aiServiceManager); // 已设置AI Service Manager
 

@@ -1,5 +1,6 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { Home } from './pages/home';
+// import { Home } from './pages/home';
+import { WorkBench } from './pages/workbench';
 
 export enum RouteConfig {
   HOME = '/',
@@ -8,7 +9,7 @@ export enum RouteConfig {
 const router = createBrowserRouter([
   {
     path: RouteConfig.HOME,
-    element: <Home />,
+    element: <WorkBench />,
   },
 ]);
 

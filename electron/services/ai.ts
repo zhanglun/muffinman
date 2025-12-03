@@ -10,6 +10,12 @@ export class AIService {
   public currentWebView: WebContentsView | null
   public isLoaded: boolean
   public sendMessage: any
+  private bounds: {
+    x: number
+    y: number
+    width: number
+    height: number
+  }
 
   constructor(config: ServiceConfig, mainWindow: BrowserWindow) {
     this.id = config.id
@@ -20,6 +26,12 @@ export class AIService {
     this.webViews = new Map() // url -> WebContentsView
     this.currentWebView = null
     this.isLoaded = false
+    this.bounds = {
+      x: 50,
+      y: 100,
+      width: 1100,
+      height: 600
+    }
   }
 
   // 创建或获取 WebContentsView
@@ -42,7 +54,7 @@ export class AIService {
     })
 
     // 设置通用大小
-    webView.setBounds({ x: 50, y: 100, width: 1100, height: 600 })
+    webView.setBounds(this.bounds)
 
     // 添加到主窗口但初始隐藏
     this.mainWindow.contentView.addChildView(webView)
@@ -192,6 +204,18 @@ export class AIService {
     webView.webContents.focus()
 
     return webView
+  }
+
+  updateBounds(bounds: {
+    x: number
+    y: number
+    width: number
+    height: number
+  }): void {
+    this.bounds = bounds
+    this.webViews.forEach((webView) => {
+      webView.setBounds(bounds)
+    })
   }
 
   // 切换到同一服务的不同 URL
