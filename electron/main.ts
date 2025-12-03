@@ -3,12 +3,11 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { AIServiceManager } from "./services/ai-manager";
 import { WindowManager } from "./managers/windows";
-import { WebviewIPC, AIIPC } from "./ipc";
+import { WebviewIPC, AIIPC, WordsIPC } from "./ipc";
 
-// 修复 __dirname 在 ES 模块中不可用的问题
+// 修复 __dirname 在 ES 模塊中不可用的問題
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-console.log("🚀 ~ __dirname:", __dirname)
 
 // The built directory structure
 //
@@ -33,55 +32,20 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
 const windowManager = new WindowManager();
 const webviewIPC = new WebviewIPC(windowManager);
 const aiIPC = new AIIPC();
-
-
-
-
-
-
-
-
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    windowManager.destroyWebContentsView();
-    app.quit();
-  }
-});
+const wordsIPC = new WordsIPC(); // 已创建WordsIPC实例
 
 app.on("activate", () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
-    windowManager.createMainWindow({
-      icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
-      webPreferences: {
-        preload: path.join(__dirname, "preload.mjs"),
-      }
-    });
-
-    const win = windowManager.getMainWindow();
-    if (win) {
-      // Test active push message to Renderer-process.
-      win.webContents.on("did-finish-load", () => {
-        win.webContents.send("main-process-message", new Date().toLocaleString());
-      });
-
-      if (VITE_DEV_SERVER_URL) {
-        win.loadURL(VITE_DEV_SERVER_URL);
-      } else {
-        // win.loadFile('dist/index.html')
-        win.loadFile(path.join(RENDERER_DIST, "index.html"));
-      }
-    }
+    createWindow();
   }
 });
 
 let aiServiceManager: AIServiceManager | null = null;
 
-app.whenReady().then(() => {
+// 统一创建窗口函数
+const createWindow = () => {
   windowManager.createMainWindow({
     icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
     webPreferences: {
@@ -93,12 +57,30 @@ app.whenReady().then(() => {
   if (win) {
     win.webContents.openDevTools();
 
-    // 初始化 AI 服务管理器
-    aiServiceManager = new AIServiceManager(win);
-    aiIPC.setAIServiceManager(aiServiceManager);
+    // Test active push message to Renderer-process.
+    win.webContents.on("did-finish-load", () => {
+      win.webContents.send("main-process-message", new Date().toLocaleString());
+    });
 
-    // 预加载常用服务
-    aiServiceManager.preloadService("openai");
-    aiServiceManager.preloadService("claude");
+    if (VITE_DEV_SERVER_URL) {
+      win.loadURL(VITE_DEV_SERVER_URL);
+    } else {
+      win.loadFile(path.join(RENDERER_DIST, "index.html"));
+    }
+
+    // 初始化 AI 服务管理器（仅在首次创建窗口时）
+    if (!aiServiceManager) {
+      aiServiceManager = new AIServiceManager(win);
+      aiIPC.setAIServiceManager(aiServiceManager);
+      wordsIPC.setAIServiceManager(aiServiceManager); // 已设置AI Service Manager
+
+      // 預加載常用服務
+      aiServiceManager.preloadService("openai");
+      aiServiceManager.preloadService("claude");
+    }
   }
+};
+
+app.whenReady().then(() => {
+  createWindow();
 });

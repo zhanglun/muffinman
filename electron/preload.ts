@@ -32,4 +32,6 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   getServiceName: (serviceId: string) => ipcRenderer.invoke('get-service-name', serviceId),
   getServiceID: (serviceId: string) => ipcRenderer.invoke('get-service-id', serviceId),
   getServiceMainWindow: (serviceId: string) => ipcRenderer.invoke('get-service-main-window', serviceId),
+
+  sendMyWords: (words: string) => ipcRenderer.send('sendMyWords', words),
 })

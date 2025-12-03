@@ -2,6 +2,8 @@ import { BrowserWindow, Session } from "electron"
 import { ServiceConfig } from "./types"
 import { AIService } from "./ai"
 
+// 添加对各个专门服务的导入
+import { KimiService } from "./kimi.service"
 
 // AI 服务管理器
 export class AIServiceManager {
@@ -70,8 +72,19 @@ export class AIServiceManager {
   }
 
   registerService(config: ServiceConfig) {
-    const service = new AIService(config, this.mainWindow)
-    this.services.set(config.id, service)
+    // 为特定服务创建专用服务类实例
+    if (config.id === 'kimi') {
+      const service = new KimiService(config, this.mainWindow)
+      this.services.set(config.id, service)
+    } else {
+      // 其他服务继续使用通用AIService
+      const service = new AIService(config, this.mainWindow)
+      this.services.set(config.id, service)
+    }
+  }
+
+  public getService(name: string): AIService | null {
+    return this.services.get(name) || null;
   }
 
   getServices(): Map<string, AIService> {

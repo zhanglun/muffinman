@@ -1,0 +1,13 @@
+{
+  "name": "muffin-electron",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "test": "vitest",
+    "test:run": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^0.34.0"
+  }
+}

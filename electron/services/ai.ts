@@ -8,7 +8,8 @@ export class AIService {
   public mainWindow: BrowserWindow
   public webViews: Map<string, WebContentsView>
   public currentWebView: WebContentsView | null
-  private isLoaded: boolean
+  public isLoaded: boolean
+  public sendMessage: any
 
   constructor(config: ServiceConfig, mainWindow: BrowserWindow) {
     this.id = config.id
@@ -171,7 +172,7 @@ export class AIService {
   }
 
   // 显示服务
-  async show(specificUrl: string | null): Promise<WebContentsView> {
+  async show(specificUrl?: string): Promise<WebContentsView> {
     const targetUrl = specificUrl || this.urls[0]
     const webView = await this.getWebView(targetUrl)
 
