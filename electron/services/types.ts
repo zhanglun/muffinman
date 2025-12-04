@@ -4,3 +4,10 @@ export interface ServiceConfig {
   name: string
   urls: string[]
 }
+
+export type MessageDto = {
+  message: string,
+  services: {
+    id: string,
+  }[],
+}

@@ -1,21 +1,17 @@
-import { BrowserWindow, Session } from "electron";
+import { Session } from "electron";
 import { ServiceConfig } from "./types";
 import { AIService } from "./ai";
-
-// 添加对各个专门服务的导入
 import { KimiService } from "./kimi.service";
 import { WindowManager } from "../managers/windows";
 
 // AI 服务管理器
 export class AIServiceManager {
   private windowManager: WindowManager;
-  private mainWindow: BrowserWindow;
   private services: Map<string, any>;
   private currentService: any | null;
 
   constructor(windowManager: WindowManager) {
     this.windowManager = windowManager;
-    this.mainWindow = windowManager.getMainWindow() as BrowserWindow;
     this.services = new Map();
     this.currentService = null;
     this.setupDefaultServices();
@@ -64,8 +60,32 @@ export class AIServiceManager {
   }
 
   registerService(config: ServiceConfig) {
-    const service = new AIService(config, this.windowManager);
-    this.services.set(config.id, service);
+    let serviceInstance: AIService;
+
+    switch (config.id.toLowerCase()) {
+      case 'kimi':
+        serviceInstance = new KimiService(config, this.windowManager);
+        break;
+      // case 'qwen':
+      //   serviceInstance = new QwenService(config, this.windowManager); // 假设你有 QwenService
+      //   break;
+      // ... 其他 case
+      default:
+        // 对于没有特定子类的服务，使用通用的 AIService
+        serviceInstance = new AIService(config, this.windowManager);
+        break;
+    }
+
+    this.services.set(config.id, serviceInstance);
+  }
+
+  destroyService(config: ServiceConfig) {
+    const service = this.services.get(config.id);
+
+    if (service) {
+      service.destroy();
+      this.services.delete(config.id);
+    }
   }
 
   public getService(name: string): AIService | null {

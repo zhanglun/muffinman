@@ -77,5 +77,13 @@ export class AIIPC {
       }
       return { success: false };
     });
+
+    ipcMain.handle("destroy-service", async (_event, serviceConfig) => {
+      if (this.aiServiceManager) {
+        this.aiServiceManager.destroyService(serviceConfig.id);
+        return { success: true };
+      }
+      return { success: false };
+    })
   }
 }

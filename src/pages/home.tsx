@@ -1,19 +1,23 @@
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea"
+import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 
 export const Home = () => {
   const [inputValue, setInputValue] = useState("");
 
   const sendMyWords = () => {
-    console.log("🚀 ~ sendMyWords ~ inputValue:", inputValue)
+    console.log("🚀 ~ sendMyWords ~ inputValue:", inputValue);
     if (inputValue.trim()) {
       (window as any).ipcRenderer?.sendMyWords({
         words: inputValue,
-        services: ['kimi'] // 可以指定要发送到哪些服务
+        services: [
+          {
+            id: "kimi",
+          }
+        ], // 可以指定要发送到哪些服务
       });
     }
-  }
+  };
 
   return (
     <div className="flex items-center justify-center">
@@ -25,11 +29,9 @@ export const Home = () => {
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
         />
-      <div>
-        <Button onClick={sendMyWords}>
-          Submit
-        </Button>
-      </div>
+        <div>
+          <Button onClick={sendMyWords}>Submit</Button>
+        </div>
       </div>
     </div>
   );

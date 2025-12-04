@@ -155,6 +155,13 @@ export const ChildViewBox = () => {
     }
   }, [showWebview, throttledUpdate]);
 
+  useEffect(() => {
+    return () => {
+      // 在组件卸载时，确保隐藏 WebContentsView
+      (window.ipcRenderer as any).destoryService(currentWebview?.id);
+    }
+  },[currentWebview]);
+
   return (
     <div
       ref={containerRef}
