@@ -50,6 +50,10 @@ export const ChildViewBox = () => {
       return;
     }
 
+    if (!currentWebview) {
+      return;
+    }
+
     const bounds = getBounds(containerRef.current);
 
     if (!bounds) {
@@ -59,7 +63,11 @@ export const ChildViewBox = () => {
     await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
 
     try {
-      await (window.ipcRenderer as any).invoke("webview:setBounds", bounds);
+      await (window.ipcRenderer as any).invoke(
+        "webview:setBounds",
+        currentWebview.id,
+        bounds
+      );
     } catch (error) {
       console.error("Failed to update webview position:", error);
     }
@@ -162,4 +170,3 @@ export const ChildViewBox = () => {
 };
 
 export default ChildViewBox;
-

@@ -10,15 +10,6 @@ export class KimiService extends AIService {
     super(config, mainWindow);
   }
 
-  async show(specificUrl?: string | null): Promise<void> {
-    await super.show(specificUrl);
-
-    // 初始化Kimi适配器，确保传递正确的 webContents 对象
-    if (this.currentWebView && !this.kimiAdapter) {
-      this.kimiAdapter = new KimiAdapter(this.currentWebView);
-    }
-  }
-
   async sendMessage(message: string): Promise<void> {
     if (this.kimiAdapter) {
       await this.kimiAdapter.sendMessage(message);

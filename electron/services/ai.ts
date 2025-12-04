@@ -1,73 +1,22 @@
-import { BrowserWindow, WebContents, WebContentsView } from "electron"
+import { WebContents, WebContentsView } from "electron"
 import { ServiceConfig } from "./types"
+import { WindowManager } from "../managers/windows"
 
 export class AIService {
   public id: string
   public name: string
   public urls: string[]
-  public mainWindow: BrowserWindow
-  public webViews: Map<string, WebContentsView>
-  public currentWebView: WebContentsView | null
   public isLoaded: boolean
   public sendMessage: any
-  private bounds: {
-    x: number
-    y: number
-    width: number
-    height: number
-  }
 
-  constructor(config: ServiceConfig, mainWindow: BrowserWindow) {
+  private windowManager: WindowManager
+
+  constructor(config: ServiceConfig, windowManager: WindowManager) {
     this.id = config.id
     this.name = config.name
     this.urls = config.urls
-    this.mainWindow = mainWindow
-
-    this.webViews = new Map() // url -> WebContentsView
-    this.currentWebView = null
     this.isLoaded = false
-    this.bounds = {
-      x: 50,
-      y: 100,
-      width: 1100,
-      height: 600
-    }
-  }
-
-  // 创建或获取 WebContentsView
-  async getWebView(url: string): Promise<WebContentsView> {
-    if (this.webViews.has(url)) {
-      return this.webViews.get(url) as WebContentsView
-    }
-
-    const webView = new WebContentsView({
-      webPreferences: {
-        nodeIntegration: false,
-        contextIsolation: true,
-        webSecurity: true,
-        allowRunningInsecureContent: false,
-        // AI 网站通常需要这些权限
-        webgl: true,
-        plugins: true,
-        experimentalFeatures: true
-      }
-    })
-
-    // 设置通用大小
-    webView.setBounds(this.bounds)
-
-    // 添加到主窗口但初始隐藏
-    this.mainWindow.contentView.addChildView(webView)
-    webView.setVisible(false)
-
-    // 设置 AI 特定的监听器
-    this.setupAIWebViewListeners(webView, url)
-
-    // 加载 URL
-    await webView.webContents.loadURL(url)
-
-    this.webViews.set(url, webView)
-    return webView
+    this.windowManager = windowManager
   }
 
   setupAIWebViewListeners(webView: WebContentsView, url: string): void {
@@ -184,20 +133,21 @@ export class AIService {
   }
 
   // 显示服务
-  async show(specificUrl?: string): Promise<WebContentsView> {
+  async show(specificUrl?: string, bounds?: { x: number, y: number, height: number, width: number}): Promise<WebContentsView> {
     const targetUrl = specificUrl || this.urls[0]
-    const webView = await this.getWebView(targetUrl)
 
-    // 隐藏其他 WebView
-    this.webViews.forEach((wv, url) => {
-      if (url !== targetUrl) {
-        wv.setVisible(false)
-      }
-    })
+    if (!this.windowManager.getChildView(this.id)) {
+    this.windowManager.createWebContentsView({
+      url: targetUrl as string, id: this.id }, bounds);
+    }
+
+    const webView = this.windowManager.getChildView(this.id) as WebContentsView
 
     // 显示目标 WebView
+    bounds && this.windowManager.updateWebViewBounds(this.id, bounds)
+
     webView.setVisible(true)
-    this.currentWebView = webView
+
     this.isLoaded = true
 
     // 确保获得焦点
@@ -206,59 +156,21 @@ export class AIService {
     return webView
   }
 
-  updateBounds(bounds: {
-    x: number
-    y: number
-    width: number
-    height: number
-  }): void {
-    this.bounds = bounds
-    this.webViews.forEach((webView) => {
-      webView.setBounds(bounds)
-    })
-  }
-
   // 切换到同一服务的不同 URL
-  async switchToURL(url: string): Promise<WebContentsView> {
+  async switchToURL(url: string) {
     if (!this.urls.includes(url)) {
       // 如果是新的 URL，添加到服务中
       this.urls.push(url)
     }
 
-    const webView = await this.getWebView(url)
-    this.show(url)
-    return webView
-  }
-
-  // 隐藏服务
-  hide(): void {
-    // 隐藏该服务的所有 webview
-    this.webViews.forEach((webView) => {
-      webView.setVisible(false)
-    })
-    this.currentWebView = null
-  }
-
-  // 预加载服务
-  async preload(): Promise<void> {
-    if (this.urls.length > 0) {
-      await this.getWebView(this.urls[0])
-      this.isLoaded = true
-    }
+    return this.windowManager.updateWebViewUrl(this.id, url);
   }
 
   getURLs(): string[] {
     return [...this.urls]
   }
 
-  // 清理资源
-  destroy(): void {
-    this.webViews.forEach(webView => {
-      this.mainWindow.contentView.removeChildView(webView)
-      if (!webView.webContents.isDestroyed()) {
-        webView.webContents.close()
-      }
-    })
-    this.webViews.clear()
+  hide() {
+
   }
 }

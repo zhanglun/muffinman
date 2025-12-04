@@ -64,15 +64,8 @@ export class AIServiceManager {
   }
 
   registerService(config: ServiceConfig) {
-    // 为特定服务创建专用服务类实例
-    if (config.id === "kimi") {
-      const service = new KimiService(config, this.mainWindow);
-      this.services.set(config.id, service);
-    } else {
-      // 其他服务继续使用通用AIService
-      const service = new AIService(config, this.mainWindow);
-      this.services.set(config.id, service);
-    }
+    const service = new AIService(config, this.windowManager);
+    this.services.set(config.id, service);
   }
 
   public getService(name: string): AIService | null {
@@ -145,7 +138,7 @@ export class AIServiceManager {
 
     this.currentService = service;
 
-    await service.show(specificUrl);
+    await service.show(specificUrl, bounds);
 
     return service;
   }

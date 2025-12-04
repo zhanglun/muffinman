@@ -10,7 +10,7 @@ export const WorkBench = () => {
       </div>
 
       {/* 右侧自适应宽度 */}
-      <div className="flex-1 bg-white p-4">
+      <div className="flex-1 bg-white">
         <ChildViewBox />
       </div>
     </div>
