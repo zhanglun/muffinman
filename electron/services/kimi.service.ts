@@ -8,9 +8,8 @@ export class KimiService extends AIService {
   }
 
   override async sendMessage(messageDto: MessageDto): Promise<void> {
-    console.log(`Sending message to Kimi: `, messageDto);
-
     const webView = this.windowManager.getChildView(this.id);
+
     if (!webView) {
       return
       // return { success: false, error: `WebView for ${this.id} not found.` };
@@ -28,23 +27,25 @@ export class KimiService extends AIService {
 
     // --- 加载完成，可以安全操作 DOM ---
     if (webView) {
-      await webView.webContents.executeJavaScript(`
-        (() => {
-          alert("Kimi is ready")
-        })
-      `)
+      console.log("🚀 ~ KimiService ~ sendMessage ~ webView:", webView)
+      try {
+        await webView.webContents.executeJavaScript(`
+          (() => {
+            console.log("Kimi is ready")
+            const p = document.querySelector('#page-layout-container > div > div.layout-content-main > div > div.chat-editor > div.chat-input > div > div > p');
+            console.log("p", p)
+            setTimeout(() => {
+              p.focus()
+              document.execCommand('insertText', false, ${JSON.stringify(messageDto.message)})
+              document.querySelector('#page-layout-container > div > div.layout-content-main > div > div.chat-editor > div.chat-editor-action > div.right-area > div.send-button-container > div').click()
+            })
+
+        })()
+        `)
+      } catch (error: Error) {
+        console.error(`[KimiService - ${this.name}] Error executing JavaScript: ${error.message}`);
+      }
     }
-
-    // 示例实现（需要根据实际需求完善）：
-    // 1. 获取 webview 实例
-    // 2. 执行 JavaScript 将消息注入到网页中
-    // 3. 触发发送操作
-
-    // 暂时保留空实现，后续补充完整逻辑
   }
 
-  async getLatestReply(): Promise<string> {
-    // TODO: 实现获取最新回复的逻辑
-    return "";
-  }
 }

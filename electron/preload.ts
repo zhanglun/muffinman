@@ -1,5 +1,5 @@
 import { ipcRenderer, contextBridge } from "electron";
-import { ServiceConfig } from "./services/types";
+import { MessageDto, ServiceConfig } from "./services/types";
 
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld("ipcRenderer", {
@@ -51,5 +51,5 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
   getServiceMainWindow: (serviceId: string) =>
     ipcRenderer.invoke("get-service-main-window", serviceId),
 
-  sendMyWords: (words: string) => ipcRenderer.send("sendMyWords", words),
+  sendMyWords: (messageDto: MessageDto) => ipcRenderer.send("sendMyWords", messageDto),
 });

@@ -9,7 +9,7 @@ export const Home = () => {
     console.log("🚀 ~ sendMyWords ~ inputValue:", inputValue);
     if (inputValue.trim()) {
       (window as any).ipcRenderer?.sendMyWords({
-        words: inputValue,
+        message: inputValue,
         services: [
           {
             id: "kimi",
