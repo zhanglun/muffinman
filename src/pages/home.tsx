@@ -3,7 +3,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 
 export const Home = () => {
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState("周末三小时学习时间，如何安排学习 HTML5 中Canvas的学习计划？");
 
   const sendMyWords = () => {
     console.log("🚀 ~ sendMyWords ~ inputValue:", inputValue);
