@@ -40,8 +40,8 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
     ipcRenderer.invoke("preload-service", serviceId),
   registerService: (serviceConfig: ServiceConfig) =>
     ipcRenderer.invoke("register-service", serviceConfig),
-  destroyService: (serviceId: string) =>
-    ipcRenderer.invoke("destroy-service", serviceId),
+  destroyService: (service: ServiceConfig) =>
+    ipcRenderer.invoke("destroy-service", service),
   getServiceURLs: (serviceId: string) =>
     ipcRenderer.invoke("get-service-urls", serviceId),
   getServiceName: (serviceId: string) =>

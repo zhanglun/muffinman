@@ -157,7 +157,7 @@ export class AIService {
 
     const webView = this.windowManager.getChildView(this.id) as WebContentsView;
 
-    console.log("🚀 ~ AIService ~ show ~ webView:", webView)
+    this.windowManager.moveToTop(this.id);
 
     // 显示目标 WebView
     bounds && this.windowManager.updateWebViewBounds(this.id, bounds);
@@ -185,8 +185,6 @@ export class AIService {
   getURLs(): string[] {
     return [...this.urls];
   }
-
-  hide() {}
 
   destroy() {
     this.windowManager.unregisterChildView(this.id);

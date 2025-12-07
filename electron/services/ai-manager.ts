@@ -145,13 +145,9 @@ export class AIServiceManager {
       return this.currentService;
     }
 
-    // 隐藏所有服务的所有 webview
-    this.services.forEach((service: any) => {
-      service.hide();
-    });
-
     // 显示新服务
     const service = this.services.get(serviceId) as any;
+    
     if (!service) {
       throw new Error(`Service ${serviceId} not found`);
     }

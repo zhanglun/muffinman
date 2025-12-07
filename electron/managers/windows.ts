@@ -140,4 +140,23 @@ export class WindowManager {
 
     return false;
   }
+  
+  public moveToTop(id: string) {
+    const webContents = this.getChildView(id);
+
+    if (webContents) {
+      const win = this.getMainWindow();
+
+      if (!win) return;
+
+      win.contentView.removeChildView(webContents);
+      win.contentView.addChildView(webContents);
+    }
+  }
+
+  public destroyAllChildViews() {
+    this.childViews.forEach((webContents) => {
+      webContents.webContents.close();
+    });
+  }
 }

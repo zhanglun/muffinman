@@ -80,7 +80,7 @@ export class AIIPC {
 
     ipcMain.handle("destroy-service", async (_event, serviceConfig) => {
       if (this.aiServiceManager) {
-        this.aiServiceManager.destroyService(serviceConfig.id);
+        this.aiServiceManager.destroyService(serviceConfig);
         return { success: true };
       }
       return { success: false };

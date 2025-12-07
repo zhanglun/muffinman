@@ -1,5 +1,6 @@
 import { ChatButton } from "@/components/chat-button";
 import ChildViewBox from "@/components/child-view-box";
+import List from "@/components/list";
 
 export const WorkBench = () => {
   return (
@@ -7,10 +8,12 @@ export const WorkBench = () => {
       {/* 左侧固定宽度300px */}
       <div className="w-[200px] bg-gray-100 p-4">
         <ChatButton />
+        <List />
       </div>
 
       {/* 右侧自适应宽度 */}
-      <div className="flex-1 bg-white">
+      <div className="flex-1 bg-gray-300 p-2">
+        <div className="h-12 ">12`3</div>
         <ChildViewBox />
       </div>
     </div>

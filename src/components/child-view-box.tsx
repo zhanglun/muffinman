@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import {
   useCurrentWebviewValue,
   useShowWebviewValue,
@@ -73,13 +73,9 @@ export const ChildViewBox = () => {
     }
   };
 
-  const throttledUpdate = useMemo(
-    () =>
-      throttle(() => {
-        void updateBounds();
-      }, 16),
-    [updateBounds]
-  );
+  const throttledUpdate = throttle(() => {
+    void updateBounds();
+  }, 16);
 
   useEffect(() => {
     const handleResize = () => throttledUpdate();
@@ -158,9 +154,11 @@ export const ChildViewBox = () => {
   useEffect(() => {
     return () => {
       // 在组件卸载时，确保隐藏 WebContentsView
-      (window.ipcRenderer as any).destoryService(currentWebview?.id);
-    }
-  },[currentWebview]);
+      // (window.ipcRenderer as any).destroyService(currentWebview?.id);
+      currentWebview?.id &&
+        (window.ipcRenderer as any).destroyService(currentWebview?.id);
+    };
+  }, [currentWebview]);
 
   return (
     <div

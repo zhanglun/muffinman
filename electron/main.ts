@@ -54,6 +54,7 @@ const createWindow = () => {
   });
 
   const win = windowManager.getMainWindow();
+
   if (win) {
     win.webContents.openDevTools();
 
@@ -78,6 +79,10 @@ const createWindow = () => {
       // aiServiceManager.preloadService("openai");
       // aiServiceManager.preloadService("claude");
     }
+
+    win.on('closed', () => {
+      windowManager.destroyAllChildViews()
+    })
   }
 };
 

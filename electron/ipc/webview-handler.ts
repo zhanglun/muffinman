@@ -28,9 +28,9 @@ export class WebviewIPC {
       return { success: true };
     });
 
-    // ipcMain.handle("webview:hide",() => {
-    //   this.windowManager.focusMainWindow();
-    // })
+    ipcMain.handle("webview:hide",() => {
+      // this.windowManager.hideWebContentsView();
+    })
 
     // ipcMain.handle("webview:exists", () => {
     //   return { exists: this.windowManager.hasWebContentsView() };

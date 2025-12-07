@@ -1,0 +1,4 @@
+.workbench-layout {
+  display: grid;
+  grid-template-areas: "sidebar toolbar, sidebar main";
+}

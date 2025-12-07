@@ -7,14 +7,14 @@ export enum RouteConfig {
 }
 
 const router = createBrowserRouter([
-  {
-    path: RouteConfig.HOME,
-    element: <Home />,
-  },
   // {
   //   path: RouteConfig.HOME,
-  //   element: <WorkBench />,
+  //   element: <Home />,
   // },
+  {
+    path: RouteConfig.HOME,
+    element: <WorkBench />,
+  },
 ]);
 
 export function Router() {
