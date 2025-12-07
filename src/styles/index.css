@@ -1,4 +1,22 @@
-.workbench-layout {
+:root {
+  --layout-workbench-sidebar-width: 240px;
+  --layout-workbench-header-height: 48px;
+}
+.layout-workbench {
   display: grid;
-  grid-template-areas: "sidebar toolbar, sidebar main";
+  grid-template-areas: "sidebar header" "sidebar view-box";
+  grid-template-columns: var(--layout-workbench-sidebar-width) 1fr;
+  grid-template-rows: var(--layout-workbench-header-height) 1fr;
+}
+
+.layout-workbench-sidebar {
+  grid-area: sidebar;
+}
+
+.layout-workbench-header {
+  grid-area: header;
+}
+
+.layout-workbench-view-area {
+  grid-area: view-box;
 }

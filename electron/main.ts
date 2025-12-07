@@ -75,9 +75,9 @@ const createWindow = () => {
       aiIPC.setAIServiceManager(aiServiceManager);
       wordsIPC.setAIServiceManager(aiServiceManager); // 已设置AI Service Manager
 
-      // 預加載常用服務
-      // aiServiceManager.preloadService("openai");
-      // aiServiceManager.preloadService("claude");
+      // aiServiceManager.preloadService("kimi");
+      // aiServiceManager.preloadService("qwen");
+      // aiServiceManager.preloadService("deepseek");
     }
 
     win.on('closed', () => {

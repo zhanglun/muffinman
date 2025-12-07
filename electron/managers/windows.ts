@@ -96,23 +96,23 @@ export class WindowManager {
     webContentsView.webContents.on("did-finish-load", () => {
       webContentsView.webContents.openDevTools();
 
-    //   // 执行 JavaScript 获取 DOM 元素
-    //   webContentsView.webContents
-    //     .executeJavaScript(
-    //       `
-    //   // 你的 DOM 操作代码，例如获取特定元素的内容
-    //   const targetElement = document.querySelector('.ds-modal-content');
-    //   const elementData = targetElement ? targetElement.innerText : '元素未找到';
-    //   elementData; // 返回获取的数据
-    // `
-    //     )
-    //     .then((result) => {
-    //       // 处理从 WebView 中返回的数据
-    //       console.log("获取到的元素数据:", result);
-    //     })
-    //     .catch((err) => {
-    //       console.error("执行 JavaScript 失败:", err);
-    //     });
+      //   // 执行 JavaScript 获取 DOM 元素
+      //   webContentsView.webContents
+      //     .executeJavaScript(
+      //       `
+      //   // 你的 DOM 操作代码，例如获取特定元素的内容
+      //   const targetElement = document.querySelector('.ds-modal-content');
+      //   const elementData = targetElement ? targetElement.innerText : '元素未找到';
+      //   elementData; // 返回获取的数据
+      // `
+      //     )
+      //     .then((result) => {
+      //       // 处理从 WebView 中返回的数据
+      //       console.log("获取到的元素数据:", result);
+      //     })
+      //     .catch((err) => {
+      //       console.error("执行 JavaScript 失败:", err);
+      //     });
     });
   }
 
@@ -140,17 +140,20 @@ export class WindowManager {
 
     return false;
   }
-  
-  public moveToTop(id: string) {
-    const webContents = this.getChildView(id);
 
-    if (webContents) {
+  public moveToTop(id: string) {
+    const webContentsView = this.getChildView(id);
+
+    if (webContentsView) {
       const win = this.getMainWindow();
 
       if (!win) return;
+      this.childViews.forEach((webContents) => {
+        webContents.setVisible(false);
+      });
 
-      win.contentView.removeChildView(webContents);
-      win.contentView.addChildView(webContents);
+      win.contentView.removeChildView(webContentsView);
+      win.contentView.addChildView(webContentsView);
     }
   }
 

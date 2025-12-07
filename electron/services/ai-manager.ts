@@ -88,6 +88,12 @@ export class AIServiceManager {
     }
   }
 
+  destroyAllService() {
+    this.services.forEach((service) => {
+      service.destroy();
+    });
+  }
+
   public getService(name: string): AIService | null {
     return this.services.get(name) || null;
   }
@@ -170,15 +176,6 @@ export class AIServiceManager {
     const service = this.services.get(serviceId) as any;
     if (service && !service.isLoaded) {
       service.preload();
-    }
-  }
-
-  // 设置当前 webview 的 bounds
-
-  // 隐藏当前服务
-  async hideCurrentService(): Promise<void> {
-    if (this.currentService) {
-      this.currentService.hide();
     }
   }
 }

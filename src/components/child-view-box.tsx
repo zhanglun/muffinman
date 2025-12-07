@@ -155,10 +155,9 @@ export const ChildViewBox = () => {
     return () => {
       // 在组件卸载时，确保隐藏 WebContentsView
       // (window.ipcRenderer as any).destroyService(currentWebview?.id);
-      currentWebview?.id &&
-        (window.ipcRenderer as any).destroyService(currentWebview?.id);
+      (window.ipcRenderer as any).destroyAllService();
     };
-  }, [currentWebview]);
+  }, []);
 
   return (
     <div

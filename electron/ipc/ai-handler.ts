@@ -85,5 +85,13 @@ export class AIIPC {
       }
       return { success: false };
     })
+
+    ipcMain.handle("destroy-all-service", async (_event) => {
+      if (this.aiServiceManager) {
+        this.aiServiceManager.destroyAllService();
+        return { success: true };
+      }
+      return { success: false };
+    })
   }
 }
