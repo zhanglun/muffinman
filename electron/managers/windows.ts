@@ -1,4 +1,10 @@
 import { BrowserWindow, WebContentsView } from "electron";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+console.log("🚀 ~ __dirname:", __dirname)
 
 export class WindowManager {
   private mainWindow: BrowserWindow | null = null;
@@ -69,7 +75,11 @@ export class WindowManager {
       return;
     }
 
-    const webContentsView = new WebContentsView();
+    const webContentsView = new WebContentsView({
+      webPreferences: {
+        preload: path.join(__dirname, "preload.mjs"),
+      },
+    });
 
     win.contentView.addChildView(webContentsView as any);
 
@@ -95,24 +105,6 @@ export class WindowManager {
     // 监听页面加载完成事件
     webContentsView.webContents.on("did-finish-load", () => {
       webContentsView.webContents.openDevTools();
-
-      //   // 执行 JavaScript 获取 DOM 元素
-      //   webContentsView.webContents
-      //     .executeJavaScript(
-      //       `
-      //   // 你的 DOM 操作代码，例如获取特定元素的内容
-      //   const targetElement = document.querySelector('.ds-modal-content');
-      //   const elementData = targetElement ? targetElement.innerText : '元素未找到';
-      //   elementData; // 返回获取的数据
-      // `
-      //     )
-      //     .then((result) => {
-      //       // 处理从 WebView 中返回的数据
-      //       console.log("获取到的元素数据:", result);
-      //     })
-      //     .catch((err) => {
-      //       console.error("执行 JavaScript 失败:", err);
-      //     });
     });
   }
 

@@ -11,7 +11,7 @@ export class KimiService extends AIService {
     const webView = this.windowManager.getChildView(this.id);
 
     if (!webView) {
-      return
+      return;
       // return { success: false, error: `WebView for ${this.id} not found.` };
     }
 
@@ -21,13 +21,13 @@ export class KimiService extends AIService {
     try {
       await this.waitForWebViewReady(webContents);
     } catch (error) {
-      return
+      return;
       // return { success: false, error: `Failed to wait for ${this.name} WebView to be ready: ${error.message}` };
     }
 
     // --- 加载完成，可以安全操作 DOM ---
     if (webView) {
-      console.log("🚀 ~ KimiService ~ sendMessage ~ webView:", webView)
+      console.log("🚀 ~ KimiService ~ sendMessage ~ webView:", webView);
       try {
         await webView.webContents.executeJavaScript(`
           (async () => {
@@ -75,18 +75,28 @@ export class KimiService extends AIService {
               await wait(100);
               p.focus();
 
-              document.execCommand('insertText', false, ${JSON.stringify(messageDto.message)})
+              document.execCommand('insertText', false, ${JSON.stringify(
+                messageDto.message
+              )})
               const btnSelector = '#page-layout-container > div > div.layout-content-main > div > div.chat-editor > div.chat-editor-action > div.right-area > div.send-button-container > div'
             const btn = await waitForInteractiveElement(btnSelector, 3000);
               btn.style.padding = '20px';
               btn.click()
 
         })()
-        `)
-      } catch (error: Error) {
-        console.error(`[KimiService - ${this.name}] Error executing JavaScript: ${error.message}`);
+        `);
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error(
+            `[KimiService - ${this.name}] Error executing JavaScript: ${error.message}`
+          );
+        } else {
+          console.error(
+            `[KimiService - ${this.name}] Unknown error occurred:`,
+            error
+          );
+        }
       }
     }
   }
-
 }

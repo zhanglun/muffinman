@@ -1,5 +1,5 @@
 import { ipcRenderer, contextBridge } from "electron";
-import { MessageDto, ServiceConfig } from "./services/types";
+import { CrossWebviewMessageDto, MessageDto, ServiceConfig } from "./services/types";
 
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld("ipcRenderer", {
@@ -54,4 +54,13 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
     ipcRenderer.invoke("get-service-main-window", serviceId),
 
   sendMyWords: (messageDto: MessageDto) => ipcRenderer.send("sendMyWords", messageDto),
+
+  sendToWebview: (messageDto: MessageDto) => ipcRenderer.invoke("webview:send-message", messageDto),
+
+  /**
+   * 嵌入到webview的方法
+   */
+
+  sendMessageFromWebview: (crossWebviewMessageDto: CrossWebviewMessageDto) => ipcRenderer.invoke("webview:send-message-back", crossWebviewMessageDto),
 });
+

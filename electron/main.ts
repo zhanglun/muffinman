@@ -5,7 +5,6 @@ import { AIServiceManager } from "./services/ai-manager";
 import { WindowManager } from "./managers/windows";
 import { WebviewIPC, AIIPC, WordsIPC } from "./ipc";
 
-// 修复 __dirname 在 ES 模塊中不可用的問題
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 

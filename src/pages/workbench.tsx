@@ -1,6 +1,7 @@
 import { ChatButton } from "@/components/chat-button";
 import ChildViewBox from "@/components/child-view-box";
 import List from "@/components/list";
+import { WorkbenchHeader } from "@/components/workbench/header";
 
 export const WorkBench = () => {
   return (
@@ -13,7 +14,7 @@ export const WorkBench = () => {
 
       {/* 右侧自适应宽度 */}
       <div className="layout-workbench-header bg-gray-300 p-2">
-        <div className="h-12 ">Header</div>
+        <WorkbenchHeader />
       </div>
       <div className="layout-workbench-view-area">
         <ChildViewBox />
