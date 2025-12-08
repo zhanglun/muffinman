@@ -38,9 +38,7 @@ export class DOMManager {
     const strategy = this.getStrategy();
     const elements = strategy.getUserMessage();
 
-    elements.forEach((item) => {
-      console.log(item.innerText, (item as HTMLElement).dataset?.umId); // 注意类型断言
-    });
+    return elements;
   }
 
   getStrategy(): DOMManagerStrategy {
