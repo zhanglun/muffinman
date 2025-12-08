@@ -1,5 +1,12 @@
 import { ipcRenderer, contextBridge } from "electron";
-import { CrossWebviewMessageDto, MessageDto, ServiceConfig } from "./services/types";
+import {
+  CrossWebviewMessageDto,
+  MessageDto,
+  ServiceConfig,
+} from "./services/types";
+import { DOMManager } from "./injects/dom/dom-manager";
+
+const domManager = new DOMManager();
 
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld("ipcRenderer", {
@@ -42,8 +49,7 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
     ipcRenderer.invoke("register-service", serviceConfig),
   destroyService: (service: ServiceConfig) =>
     ipcRenderer.invoke("destroy-service", service),
-  destroyAllService: () =>
-    ipcRenderer.invoke("destroy-all-service"),
+  destroyAllService: () => ipcRenderer.invoke("destroy-all-service"),
   getServiceURLs: (serviceId: string) =>
     ipcRenderer.invoke("get-service-urls", serviceId),
   getServiceName: (serviceId: string) =>
@@ -53,14 +59,23 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
   getServiceMainWindow: (serviceId: string) =>
     ipcRenderer.invoke("get-service-main-window", serviceId),
 
-  sendMyWords: (messageDto: MessageDto) => ipcRenderer.send("sendMyWords", messageDto),
+  sendMyWords: (messageDto: MessageDto) =>
+    ipcRenderer.send("sendMyWords", messageDto),
 
-  sendToWebview: (messageDto: MessageDto) => ipcRenderer.invoke("webview:send-message", messageDto),
+  sendToWebview: (messageDto: MessageDto) =>
+    ipcRenderer.invoke("webview:send-message", messageDto),
 
   /**
    * 嵌入到webview的方法
    */
 
-  sendMessageFromWebview: (crossWebviewMessageDto: CrossWebviewMessageDto) => ipcRenderer.invoke("webview:send-message-back", crossWebviewMessageDto),
-});
+  sendMessageFromWebview: (crossWebviewMessageDto: CrossWebviewMessageDto) =>
+    ipcRenderer.invoke("webview:send-message-back", crossWebviewMessageDto),
 
+  DOMManager: {
+    getUserMessageDOM: () => {
+      const result = domManager.getUserMessageDOM();
+      console.log("🚀 ~ result:", result);
+    },
+  },
+});

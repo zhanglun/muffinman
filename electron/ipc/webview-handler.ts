@@ -10,17 +10,17 @@ export class WebviewIPC {
 
   private registerHandlers() {
     // 处理来自渲染进程的执行请求
-    ipcMain.handle("webview:send-message", async (_event, messgeDto: MessageDto) => {
-      const { services } = messgeDto;
+    ipcMain.handle("webview:send-message", async (_event, messageDto: MessageDto) => {
+      const { services } = messageDto;
       const webviewId = services[0]?.id;
       const webview = this.windowManager.getChildView(webviewId);
 
       if (webview) {
         // 发送结果给WebView
-        console.log('------> webview:message')
         await webview.webContents.executeJavaScript(`
           (() => {
-            console.log("Kimi is ready", window.ipcRenderer);
+            window.ipcRenderer.DOMManager.getUserMessageDOM();
+            
             window.ipcRenderer.sendMessageFromWebview({
             id: "${webviewId}",
             payload: ${JSON.stringify({ data: 1323 })},
