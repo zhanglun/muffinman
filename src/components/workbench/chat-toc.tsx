@@ -1,23 +1,38 @@
-import { useCurrentWebview } from "@/atoms/ai-services-atoms"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { useCurrentWebview } from "@/atoms/ai-services-atoms";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
 
 export function ChatToc() {
   const [currentWebview] = useCurrentWebview();
 
-  const handleOpenChange = (open: boolean) => {
-    if (open) {
-      (window.ipcRenderer as any).WindowManager.setMainViewToTop();
-    } else {
-      (window.ipcRenderer as any).WindowManager.setChildViewToTop(currentWebview?.id);
+  const handleOpenChange = async (open: boolean) => {
+    if (currentWebview) {
+      if (open) {
+        (window.ipcRenderer as any).WindowManager.setMainViewToTop();
+        const a = await (window.ipcRenderer as any).sendToWebview({
+          message: "toggle-toc",
+          services: [
+            {
+              id: currentWebview.id,
+              name: currentWebview.name,
+              urls: currentWebview.urls,
+            },
+          ],
+        });
+        alert(a)
+      } else {
+        (window.ipcRenderer as any).WindowManager.setChildViewToTop(
+          currentWebview.id
+        );
+      }
     }
-  }
+  };
   return (
     <Popover onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
@@ -68,5 +83,5 @@ export function ChatToc() {
         </div>
       </PopoverContent>
     </Popover>
-  )
+  );
 }

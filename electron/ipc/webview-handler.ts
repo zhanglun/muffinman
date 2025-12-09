@@ -19,21 +19,24 @@ export class WebviewIPC {
         // 发送结果给WebView
         await webview.webContents.executeJavaScript(`
           (() => {
-            window.ipcRenderer.DOMManager.getUserMessageDOM();
+            const list = window.ipcRenderer.DOMManager.getUserMessageDOM();
             
             window.ipcRenderer.sendMessageFromWebview({
-            id: "${webviewId}",
-            payload: ${JSON.stringify({ data: 1323 })},
-            services: ${JSON.stringify(services)}});
+              id: "${webviewId}",
+              payload: {
+                list: list
+              },
+              services: ${JSON.stringify(services)}
+            });
           })()
         `)
-        // webview?.send("webview:function-result", result);
       }
     });
 
     ipcMain.handle("webview:send-message-back", async (_event, crossWebviewMessageDto: CrossWebviewMessageDto) => {
       console.log("🚀 ~ WebviewIPC ~ registerHandlers ~ crossWebviewMessageDto:", crossWebviewMessageDto)
-      return 'haha';
+      
+      // TODO： 将数据发送给渲染进程
     });
 
     ipcMain.handle("webview:destroy", () => {

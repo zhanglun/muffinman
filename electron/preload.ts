@@ -77,7 +77,7 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
   DOMManager: {
     getUserMessageDOM: () => {
       const result = domManager.getUserMessageDOM();
-      console.log("🚀 ~ result:", result);
+      return result;
     },
   },
 
