@@ -162,7 +162,7 @@ export const ChildViewBox = () => {
   return (
     <div
       ref={containerRef}
-      className="w-full h-full overflow-hidden bg-[#1a1a1a] relative"
+      className="w-full h-full overflow-hidden bg-[transparent] relative"
     >
       {!showWebview && (
         <div className="flex items-center justify-center w-full h-full text-[#888] text-sm">

@@ -4,10 +4,10 @@ import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-console.log("🚀 ~ __dirname:", __dirname)
 
 export class WindowManager {
   private mainWindow: BrowserWindow | null = null;
+  private mainView: WebContentsView | null = null;
   private childViews: Map<string, WebContentsView> = new Map();
 
   createMainWindow(
@@ -22,6 +22,14 @@ export class WindowManager {
     });
 
     return this.mainWindow;
+  }
+
+  createMainView(options: Electron.WebContentsViewConstructorOptions): WebContentsView {
+    if (!this.mainView) {
+      this.mainView = new WebContentsView(options);
+    }
+
+    return this.mainView;
   }
 
   getMainWindow(): BrowserWindow | null {
@@ -133,17 +141,29 @@ export class WindowManager {
     return false;
   }
 
+  public moveMainViewToTop() {
+    const win = this.getMainWindow();
+
+    if (this.mainView && win) {
+      win.contentView.removeChildView(this.mainView);
+      win.contentView.addChildView(this.mainView);
+    }
+  }
+
   public moveToTop(id: string) {
     const webContentsView = this.getChildView(id);
+    console.log("🚀 ~ WindowManager ~ moveToTop ~ webContentsView:", webContentsView)
 
     if (webContentsView) {
       const win = this.getMainWindow();
 
       if (!win) return;
-      this.childViews.forEach((webContents) => {
-        webContents.setVisible(false);
-      });
 
+      // this.childViews.forEach((webContents) => {
+      //   webContents.setVisible(false);
+      // });
+
+      console.log('---->')
       win.contentView.removeChildView(webContentsView);
       win.contentView.addChildView(webContentsView);
     }

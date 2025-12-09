@@ -37,21 +37,19 @@ export class WebviewIPC {
     });
 
     ipcMain.handle("webview:destroy", () => {
-      console.log(
-        "TODO: 🚀 ~ WebviewIPC ~ registerHandlers ~ webview:destroy:"
-      );
-      // this.destroyWebContentsView();
-
       return { success: true };
     });
 
     ipcMain.handle("webview:hide", () => {
-      // this.windowManager.hideWebContentsView();
     });
 
-    // ipcMain.handle("webview:exists", () => {
-    //   return { exists: this.windowManager.hasWebContentsView() };
-    // });
+    ipcMain.handle("webview:set-main-view-to-top", () => {
+      this.windowManager.moveMainViewToTop();
+    });
+
+    ipcMain.handle("webview:set-child-view-to-top", (_event, serviceId) => {
+      this.windowManager.moveToTop(serviceId);
+    });
 
     ipcMain.handle(
       "webview:setBounds",

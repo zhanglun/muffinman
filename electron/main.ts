@@ -48,24 +48,45 @@ const createWindow = () => {
   windowManager.createMainWindow({
     icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
     webPreferences: {
+      transparent: true,
       preload: path.join(__dirname, "preload.mjs"),
-    }
+    },
   });
 
   const win = windowManager.getMainWindow();
+  const mainView = windowManager.createMainView({
+    webPreferences: {
+      transparent: true,
+      preload: path.join(__dirname, "preload.mjs"),
+    },
+  });
 
-  if (win) {
+  if (win && mainView) {
+    win.on("resize", () => {
+      const { width, height } = win.getBounds();
+      mainView.setBounds({ x: 0, y: 0, width, height });
+    });
+
     win.webContents.openDevTools();
 
     // Test active push message to Renderer-process.
-    win.webContents.on("did-finish-load", () => {
-      win.webContents.send("main-process-message", new Date().toLocaleString());
+    mainView.webContents.on("did-finish-load", () => {
+      mainView.webContents.send(
+        "main-process-message",
+        new Date().toLocaleString()
+      );
+
+      const { width, height } = win.getBounds();
+      mainView.setBounds({ x: 0, y: 0, width, height });
+      win.contentView.addChildView(mainView as any);
+      mainView.webContents.openDevTools();
     });
 
     if (VITE_DEV_SERVER_URL) {
-      win.loadURL(VITE_DEV_SERVER_URL);
+      mainView.webContents.loadURL(VITE_DEV_SERVER_URL);
     } else {
-      win.loadFile(path.join(RENDERER_DIST, "index.html"));
+      console.log("dist load file");
+      mainView.webContents.loadFile(path.join(RENDERER_DIST, "index.html"));
     }
 
     // 初始化 AI 服务管理器（仅在首次创建窗口时）
@@ -79,9 +100,9 @@ const createWindow = () => {
       // aiServiceManager.preloadService("deepseek");
     }
 
-    win.on('closed', () => {
-      windowManager.destroyAllChildViews()
-    })
+    win.on("closed", () => {
+      windowManager.destroyAllChildViews();
+    });
   }
 };
 

@@ -5,6 +5,8 @@ import {
   ServiceConfig,
 } from "./services/types";
 import { DOMManager } from "./injects/dom/dom-manager";
+import { WindowManager } from "./managers/windows";
+import { set } from "react-hook-form";
 
 const domManager = new DOMManager();
 
@@ -78,4 +80,13 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
       console.log("🚀 ~ result:", result);
     },
   },
+
+  WindowManager: {
+    setMainViewToTop: () => {
+      ipcRenderer.invoke("webview:set-main-view-to-top");
+    },
+    setChildViewToTop: (serviceId: string) => {
+      ipcRenderer.invoke("webview:set-child-view-to-top", serviceId);
+    }
+  }
 });

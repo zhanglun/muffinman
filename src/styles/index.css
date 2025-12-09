@@ -2,6 +2,11 @@
   --layout-workbench-sidebar-width: 240px;
   --layout-workbench-header-height: 48px;
 }
+
+html,body,#root {
+  background-color: transparent !important;
+}
+
 .layout-workbench {
   display: grid;
   grid-template-areas: "sidebar header" "sidebar view-box";
