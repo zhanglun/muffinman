@@ -152,7 +152,6 @@ export class WindowManager {
 
   public moveToTop(id: string) {
     const webContentsView = this.getChildView(id);
-    console.log("🚀 ~ WindowManager ~ moveToTop ~ webContentsView:", webContentsView)
 
     if (webContentsView) {
       const win = this.getMainWindow();
@@ -163,7 +162,6 @@ export class WindowManager {
       //   webContents.setVisible(false);
       // });
 
-      console.log('---->')
       win.contentView.removeChildView(webContentsView);
       win.contentView.addChildView(webContentsView);
     }

@@ -18,6 +18,7 @@ export type CrossWebviewMessageDto = {
   message: string,
   action: string,
   payload: any,
+  fromId: string,
   services: {
     id: string,
     name?: string,

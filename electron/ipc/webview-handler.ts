@@ -10,41 +10,62 @@ export class WebviewIPC {
 
   private registerHandlers() {
     // 处理来自渲染进程的执行请求
-    ipcMain.handle("webview:send-message", async (_event, messageDto: MessageDto) => {
-      const { services } = messageDto;
-      const webviewId = services[0]?.id;
-      const webview = this.windowManager.getChildView(webviewId);
+    ipcMain.on(
+      "webview:send-message",
+      async (_event, messageDto: MessageDto) => {
+        const { services } = messageDto;
+        const webviewId = services[0]?.id;
+        const webview = this.windowManager.getChildView(webviewId);
 
-      if (webview) {
-        // 发送结果给WebView
-        await webview.webContents.executeJavaScript(`
+        if (webview) {
+          // 发送结果给WebView
+          await webview.webContents.executeJavaScript(`
           (() => {
             const list = window.ipcRenderer.DOMManager.getUserMessageDOM();
-            
+
             window.ipcRenderer.sendMessageFromWebview({
-              id: "${webviewId}",
+              message: 'message-list',
+              action: 'get-message-list',
+              fromId: "${webviewId}",
               payload: {
                 list: list
               },
               services: ${JSON.stringify(services)}
             });
           })()
-        `)
-      }
-    });
+        `);
 
-    ipcMain.handle("webview:send-message-back", async (_event, crossWebviewMessageDto: CrossWebviewMessageDto) => {
-      console.log("🚀 ~ WebviewIPC ~ registerHandlers ~ crossWebviewMessageDto:", crossWebviewMessageDto)
-      
-      // TODO： 将数据发送给渲染进程
-    });
+          return "success";
+        }
+      }
+    );
+
+    ipcMain.on(
+      "webview:send-message-back",
+      async (_event, crossWebviewMessageDto: CrossWebviewMessageDto) => {
+        const webview = this.windowManager.getChildView(
+          crossWebviewMessageDto.fromId
+        );
+        const mainWindow = this.windowManager.getMainWindow();
+
+        if (webview && mainWindow) {
+          console.log(
+            "🚀 ~ WebviewIPC ~ registerHandlers ~ CrossWebviewMessageDto:",
+            crossWebviewMessageDto
+          );
+          mainWindow.webContents.send(
+            "webview:received-message",
+            crossWebviewMessageDto
+          );
+        }
+      }
+    );
 
     ipcMain.handle("webview:destroy", () => {
       return { success: true };
     });
 
-    ipcMain.handle("webview:hide", () => {
-    });
+    ipcMain.handle("webview:hide", () => {});
 
     ipcMain.handle("webview:set-main-view-to-top", () => {
       this.windowManager.moveMainViewToTop();

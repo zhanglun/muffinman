@@ -7,6 +7,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useEffect } from "react";
 
 export function ChatToc() {
   const [currentWebview] = useCurrentWebview();
@@ -25,7 +26,7 @@ export function ChatToc() {
             },
           ],
         });
-        alert(a)
+        console.log(a);
       } else {
         (window.ipcRenderer as any).WindowManager.setChildViewToTop(
           currentWebview.id
@@ -33,6 +34,16 @@ export function ChatToc() {
       }
     }
   };
+
+  useEffect(() => {
+    // 添加正确的事件监听清理机制
+    const handleMessage = (value) => {
+      console.log("🚀 ~ ChatToc ~ value:", value);
+    };
+
+    (window.ipcRenderer as any).onReceivedMessage(handleMessage);
+  }, []);
+
   return (
     <Popover onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>

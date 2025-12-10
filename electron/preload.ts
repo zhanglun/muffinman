@@ -5,8 +5,8 @@ import {
   ServiceConfig,
 } from "./services/types";
 import { DOMManager } from "./injects/dom/dom-manager";
-import { WindowManager } from "./managers/windows";
-import { set } from "react-hook-form";
+
+type MessageCallback = (value: unknown) => void;
 
 const domManager = new DOMManager();
 
@@ -65,14 +65,13 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
     ipcRenderer.send("sendMyWords", messageDto),
 
   sendToWebview: (messageDto: MessageDto) =>
-    ipcRenderer.invoke("webview:send-message", messageDto),
+    ipcRenderer.send("webview:send-message", messageDto),
 
   /**
    * 嵌入到webview的方法
    */
-
   sendMessageFromWebview: (crossWebviewMessageDto: CrossWebviewMessageDto) =>
-    ipcRenderer.invoke("webview:send-message-back", crossWebviewMessageDto),
+    ipcRenderer.send("webview:send-message-back", crossWebviewMessageDto),
 
   DOMManager: {
     getUserMessageDOM: () => {
@@ -87,6 +86,15 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
     },
     setChildViewToTop: (serviceId: string) => {
       ipcRenderer.invoke("webview:set-child-view-to-top", serviceId);
-    }
-  }
+    },
+  },
+
+  /**
+   * mainview 处理逻辑
+   */
+  onReceivedMessage: (callback: MessageCallback) => {
+    ipcRenderer.on("webview:received-message", (_event, value) =>
+      callback(value)
+    );
+  },
 });
