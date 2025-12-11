@@ -6,7 +6,7 @@ export const Toolbar = () => {
     console.log("🚀 ~ Toolbar ~ currentWebview:", currentWebview);
 
     if (currentWebview) {
-      (window.ipcRenderer as any).sendToWebview({
+      (window.ipcRenderer as any).sendMessageToChildView({
         message: "toggle-toc",
         services: [{
           id: currentWebview.id,

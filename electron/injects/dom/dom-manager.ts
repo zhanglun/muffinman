@@ -34,7 +34,7 @@ export class DOMManager {
   }
 
   // 统一的对外 API
-  getUserMessageDOM(): void {
+  getUserMessageDOM() {
     const strategy = this.getStrategy();
     const elements = strategy.getUserMessage();
 

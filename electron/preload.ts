@@ -64,14 +64,14 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
   sendMyWords: (messageDto: MessageDto) =>
     ipcRenderer.send("sendMyWords", messageDto),
 
-  sendToWebview: (messageDto: MessageDto) =>
-    ipcRenderer.send("webview:send-message", messageDto),
+  sendMessageToChildView: (messageDto: MessageDto) =>
+    ipcRenderer.send("webview:send-message-to-child-view", messageDto),
 
   /**
    * 嵌入到webview的方法
    */
-  sendMessageFromWebview: (crossWebviewMessageDto: CrossWebviewMessageDto) =>
-    ipcRenderer.send("webview:send-message-back", crossWebviewMessageDto),
+  sendMessageToMainView: (crossWebviewMessageDto: CrossWebviewMessageDto) =>
+    ipcRenderer.send("webview:send-message-to-main-view", crossWebviewMessageDto),
 
   DOMManager: {
     getUserMessageDOM: () => {

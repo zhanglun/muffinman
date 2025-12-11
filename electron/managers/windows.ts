@@ -36,6 +36,10 @@ export class WindowManager {
     return this.mainWindow;
   }
 
+  getMainView(): WebContentsView | null {
+    return this.mainView;
+  }
+
   // 注册子视图
   registerChildView(id: string, webContents: WebContentsView): void {
     this.childViews.set(id, webContents);

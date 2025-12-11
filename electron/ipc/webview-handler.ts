@@ -11,25 +11,26 @@ export class WebviewIPC {
   private registerHandlers() {
     // 处理来自渲染进程的执行请求
     ipcMain.on(
-      "webview:send-message",
+      "webview:send-message-to-child-view",
       async (_event, messageDto: MessageDto) => {
-        const { services } = messageDto;
+        const { services, message, action, payload } = messageDto;
         const webviewId = services[0]?.id;
         const webview = this.windowManager.getChildView(webviewId);
 
         if (webview) {
-          // 发送结果给WebView
+          // 发送结果给WebView,
+          // TODO: 将代码从字符串模板中抽离， 根据action来执行不同的函数，返回数据之后再转发
           await webview.webContents.executeJavaScript(`
           (() => {
-            const list = window.ipcRenderer.DOMManager.getUserMessageDOM();
 
-            window.ipcRenderer.sendMessageFromWebview({
-              message: 'message-list',
-              action: 'get-message-list',
+            const list = window.ipcRenderer.DOMManager.getUserMessageDOM();
+            const result = { list: list}
+
+            window.ipcRenderer.sendMessageToMainView({
+              message: "${message}",
+              action: "${action}",
               fromId: "${webviewId}",
-              payload: {
-                list: list
-              },
+              payload: result,
               services: ${JSON.stringify(services)}
             });
           })()
@@ -41,19 +42,17 @@ export class WebviewIPC {
     );
 
     ipcMain.on(
-      "webview:send-message-back",
+      "webview:send-message-to-main-view",
       async (_event, crossWebviewMessageDto: CrossWebviewMessageDto) => {
-        const webview = this.windowManager.getChildView(
-          crossWebviewMessageDto.fromId
-        );
         const mainWindow = this.windowManager.getMainWindow();
+        const mainView = this.windowManager.getMainView();
 
-        if (webview && mainWindow) {
+        if (mainView && mainWindow) {
           console.log(
             "🚀 ~ WebviewIPC ~ registerHandlers ~ CrossWebviewMessageDto:",
             crossWebviewMessageDto
           );
-          mainWindow.webContents.send(
+          mainView.webContents.send(
             "webview:received-message",
             crossWebviewMessageDto
           );
