@@ -14,6 +14,7 @@ export class DOMManager {
     const url = window.location.href;
     if (url.includes("kimi")) return "kimi";
     if (url.includes("deepseek")) return "deepseek";
+    if (url.includes("qwen.ai")) return "qwen";
     // 3. 从其他标识符解析，比如页面标题、特定 DOM 元素等
     // ...
     return "default";
@@ -21,6 +22,7 @@ export class DOMManager {
 
   // 根据类型获取对应策略实例的辅助方法
   private getStrategyForType(type: string): DOMManagerStrategy {
+    console.log("🚀 ~ DOMManager ~ getStrategyForType ~ type:", type)
     switch (type.toLowerCase()) {
       case "kimi":
         return new KimiDOMManagerStrategy();
@@ -45,5 +47,13 @@ export class DOMManager {
     const currentType = this.getCurrentWebViewType();
 
     return this.getStrategyForType(currentType);
+  }
+
+  getMessageById(selector: string) {
+    console.log("🚀 ~ DOMManager ~ getMessageById ~ selector:", selector)
+    const strategy = this.getStrategy();
+    const elements = strategy.getMessageById(selector);
+
+    elements?.scrollIntoView();
   }
 }

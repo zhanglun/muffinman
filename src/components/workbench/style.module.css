@@ -1,0 +1,18 @@
+.messageList {
+  display: grid;
+  gap: 8px;
+}
+
+.messageCard {
+  min-width: 0px;
+}
+
+.messageContent {
+  height: 48px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  line-clamp: 2;
+  cursor: pointer;
+}

@@ -6,6 +6,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useEffect, useState } from "react";
+import styles from "./style.module.css";
 
 export function ChatToc() {
   const [currentWebview] = useCurrentWebview();
@@ -78,10 +79,10 @@ export function ChatToc() {
           <div className="space-y-2">
             <h4 className="leading-none font-medium">对话记录</h4>
           </div>
-          <div className="grid gap-2">
+          <div className={styles.messageList}>
             {messageList.map((message, index) => (
-              <div className="min-w-0" key={index} onClick={() => handleMessageClick(message)}>
-                <div className="text-sm overflow-hidden text-ellipsis whitespace-nowrap">{message.text}</div>
+              <div className={styles.messageCard} key={index} onClick={() => handleMessageClick(message)}>
+                <div className={styles.messageContent}>{index} - {message.text}</div>
               </div>
             ))}
           </div>

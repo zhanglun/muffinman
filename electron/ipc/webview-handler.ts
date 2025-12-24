@@ -20,7 +20,8 @@ export class WebviewIPC {
         if (webview) {
           // 发送结果给WebView,
           // TODO: 将代码从字符串模板中抽离， 根据action来执行不同的函数，返回数据之后再转发
-          await webview.webContents.executeJavaScript(`
+          if (action === "get-message-list") {
+            await webview.webContents.executeJavaScript(`
           (() => {
 
             const list = window.ipcRenderer.DOMManager.getUserMessageDOM();
@@ -35,6 +36,20 @@ export class WebviewIPC {
             });
           })()
         `);
+          }
+
+          if (action === "scroll-to-message") {
+            await webview.webContents.executeJavaScript(`
+          (() => {
+            const selector = '${payload.selector}';
+            console.log(selector);
+            const message = window.ipcRenderer.DOMManager.getMessageById(selector);
+            if (message) {
+              message.scrollIntoView();
+            }
+          })()
+        `);
+          }
 
           return "success";
         }

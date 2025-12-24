@@ -78,6 +78,9 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
       const result = domManager.getUserMessageDOM();
       return result;
     },
+    getMessageById(selector: string) {
+      return domManager.getMessageById(selector);
+    }
   },
 
   WindowManager: {
@@ -97,4 +100,12 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
       callback(value)
     );
   },
+
+  // child webview 相关的代码
+  init: () => {
+    console.log("child webview init !")
+    window.addEventListener("DOMContentLoaded", () => {
+      console.log("DOMContentLoaded !")
+    });
+  }
 });

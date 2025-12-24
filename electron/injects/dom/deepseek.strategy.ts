@@ -12,4 +12,10 @@ export class DeepSeekDOMManagerStrategy implements DOMManagerStrategy {
       }
     })
   }
+
+  getMessageById(selector: string): Element | null {
+    const message = document.querySelector(selector);
+
+    return message;
+  }
 }
